@@ -26,8 +26,7 @@ fn build_ui(application: &gtk::Application) {
     let window = gtk::ApplicationWindow::builder()
         .application(application)
         .title("passmumbler")
-        .default_width(660)
-        .default_height(420)
+        .modal(true)
         .build();
 
     let display = gdk::Display::default().unwrap();
@@ -41,7 +40,6 @@ fn build_ui(application: &gtk::Application) {
         .margin_end(24)
         .halign(gtk::Align::Center)
         .valign(gtk::Align::Center)
-        .spacing(24)
         .build();
 
     let text_container = gtk::Box::builder()
