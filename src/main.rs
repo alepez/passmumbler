@@ -37,10 +37,14 @@ fn read_from_stdin() -> (Option<String>, Option<String>) {
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
 
-    let (username, password) = read_from_stdin();
+    let (username, password) = if cli.stdin {
+        read_from_stdin()
+    } else {
+        (Some(cli.username), Some(cli.password))
+    };
 
-    let username = username.unwrap_or(cli.username);
-    let password = password.unwrap_or(cli.password);
+    let username = username.unwrap_or_default();
+    let password = password.unwrap_or_default();
 
     let window = gtk::ApplicationWindow::builder()
         .application(application)
@@ -102,4 +106,7 @@ struct Cli {
     /// Password
     #[arg(short = 'p', long, default_value = "")]
     password: String,
+    /// Read from stdin
+    #[arg(short = 'i', long)]
+    stdin: bool,
 }
