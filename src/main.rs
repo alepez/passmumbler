@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::io::BufRead;
 
 use gtk4 as gtk;
 
@@ -18,10 +19,28 @@ fn main() -> glib::ExitCode {
     application.run_with_args(args)
 }
 
+fn read_from_stdin() -> (Option<String>, Option<String>) {
+    let stdin = std::io::stdin();
+    let mut lines = stdin.lock().lines();
+    let password = lines.next().and_then(|x| x.ok());
+    let username = lines.find_map(|line| {
+        let line = line.ok()?;
+        if line.starts_with("username: ") {
+            Some(line.trim_start_matches("username: ").to_string())
+        } else {
+            None
+        }
+    });
+    (username, password)
+}
+
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
-    let username = cli.username;
-    let password = cli.password;
+
+    let (username, password) = read_from_stdin();
+
+    let username = username.unwrap_or(cli.username);
+    let password = password.unwrap_or(cli.password);
 
     let window = gtk::ApplicationWindow::builder()
         .application(application)
