@@ -71,7 +71,7 @@ fn build_ui(application: &gtk::Application) {
         .spacing(24)
         .build();
 
-    let username_btn = gtk::Button::with_label("Username");
+    let username_btn = gtk::Button::with_label(username.as_str());
     username_btn.connect_clicked(clone!(@weak clipboard => move |_btn| {
         clipboard.set_text(username.as_str());
     }));
