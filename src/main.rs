@@ -46,6 +46,10 @@ fn build_ui(application: &gtk::Application) {
     let username = username.unwrap_or_default();
     let password = password.unwrap_or_default();
 
+    if username.is_empty() || password.is_empty() {
+        return;
+    }
+
     let window = gtk::ApplicationWindow::builder()
         .application(application)
         .title("passmumbler")
