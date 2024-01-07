@@ -40,7 +40,7 @@ fn build_ui(application: &gtk::Application) {
     let (username, password) = if cli.stdin {
         read_from_stdin()
     } else {
-        (Some(cli.username), Some(cli.password))
+        (cli.username, cli.password)
     };
 
     let username = username.unwrap_or_default();
@@ -105,11 +105,11 @@ fn build_ui(application: &gtk::Application) {
 #[command(author, version, about, long_about = None)]
 struct Cli {
     /// Username
-    #[arg(short = 'u', long, default_value = "")]
-    username: String,
+    #[arg(short = 'u', long)]
+    username: Option<String>,
     /// Password
-    #[arg(short = 'p', long, default_value = "")]
-    password: String,
+    #[arg(short = 'p', long)]
+    password: Option<String>,
     /// Read from stdin
     #[arg(short = 'i', long)]
     stdin: bool,
