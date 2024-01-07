@@ -35,7 +35,7 @@ fn build_ui(application: &gtk::Application) {
             let entries = passmumbler::pass::list_entries();
             let entries: Vec<&str> = entries.iter().map(|s| s.as_str()).collect();
             let entry = match cli.interface {
-                SelectInterface::Rofi => select::rofi::select(&entries),
+                SelectInterface::Rofi => select::rofi::select(&cli.prefix, &entries),
             };
             if let Some(entry) = entry {
                 let secrets = passmumbler::pass::load_secrets(&entry).unwrap();
@@ -105,6 +105,8 @@ struct Select {
     /// The interface to use to select the secret
     #[arg(value_enum, short = 'i', long, default_value = "rofi")]
     interface: SelectInterface,
+    #[arg(short = 'p', long, default_value = "")]
+    prefix: String,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
