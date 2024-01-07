@@ -11,6 +11,7 @@ use gtk::{
 };
 
 const APPLICATION_ID: &str = "net.pezzato.passmumbler";
+const APPLICATION_NAME: &str = "passmumbler";
 
 fn main() -> glib::ExitCode {
     let application = gtk::Application::builder()
@@ -38,7 +39,7 @@ fn build_ui(application: &gtk::Application) {
 
     let window = gtk::ApplicationWindow::builder()
         .application(application)
-        .title("passmumbler")
+        .title(APPLICATION_NAME)
         .modal(true)
         .build();
 
