@@ -10,9 +10,11 @@ use gtk::{
     prelude::*,
 };
 
+const APPLICATION_ID: &str = "net.pezzato.passmumbler";
+
 fn main() -> glib::ExitCode {
     let application = gtk::Application::builder()
-        .application_id("net.pezzato.passmumbler")
+        .application_id(APPLICATION_ID)
         .build();
     application.connect_activate(build_ui);
 
@@ -43,20 +45,17 @@ fn build_ui(application: &gtk::Application) {
     let display = gdk::Display::default().unwrap();
     let clipboard = display.clipboard();
 
+    const SPACING: i32 = 12;
+
     let container = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
-        .margin_top(24)
-        .margin_bottom(24)
-        .margin_start(24)
-        .margin_end(24)
+        .margin_top(SPACING)
+        .margin_start(SPACING)
+        .margin_end(SPACING)
+        .margin_bottom(SPACING)
+        .spacing(SPACING)
         .halign(gtk::Align::Center)
         .valign(gtk::Align::Center)
-        .build();
-
-    let text_container = gtk::Box::builder()
-        .halign(gtk::Align::Center)
-        .orientation(gtk::Orientation::Horizontal)
-        .spacing(24)
         .build();
 
     for (label, data) in secrets.0.iter() {
@@ -64,18 +63,8 @@ fn build_ui(application: &gtk::Application) {
         btn.connect_clicked(clone!(@to-owned data, @weak clipboard => move |_btn| {
             clipboard.set_text(data.as_str());
         }));
-        text_container.append(&btn);
+        container.append(&btn);
     }
-
-    container.append(&text_container);
-
-    let texture_container = gtk::Box::builder()
-        .orientation(gtk::Orientation::Horizontal)
-        .halign(gtk::Align::Center)
-        .spacing(24)
-        .build();
-
-    container.append(&texture_container);
 
     window.set_child(Some(&container));
     window.present();
