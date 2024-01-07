@@ -124,12 +124,12 @@ where
         let mut lines = reader.lines();
         let password = lines.next().unwrap().unwrap();
         let other = lines
-            .map(|line| {
+            .filter_map(|line| {
                 let line = line.unwrap();
                 let mut parts = line.splitn(2, ':');
-                let id = parts.next().unwrap();
-                let data = parts.next().unwrap().trim_start();
-                (id.to_string(), data.to_string())
+                let id = parts.next()?;
+                let data = parts.next()?.trim_start();
+                Some((id.to_string(), data.to_string()))
             })
             .collect();
         Self { password, other }
@@ -169,5 +169,13 @@ mod tests {
         assert_eq!(secrets.password, "password");
         assert_eq!(secrets.other.len(), 1);
         assert_eq!(secrets.other.get("username").unwrap(), "test");
+    }
+
+    #[test]
+    fn test_invalid_multiline() {
+        let input = b"password\nasdasd\nqweqwe".as_slice();
+        let secrets = Secrets::from(input);
+        assert_eq!(secrets.password, "password");
+        assert_eq!(secrets.other.len(), 0);
     }
 }
