@@ -35,12 +35,16 @@ fn build_ui(application: &gtk::Application) {
     };
 
     let username = secrets
-        .other
+        .0
         .get("username")
         .unwrap_or(&"".to_string())
         .to_string();
 
-    let password = secrets.password;
+    let password = secrets
+        .0
+        .get("password")
+        .unwrap_or(&"".to_string())
+        .to_string();
 
     let window = gtk::ApplicationWindow::builder()
         .application(application)
@@ -111,9 +115,12 @@ type SecretId = String;
 
 type SecretData = String;
 
-struct Secrets {
-    password: SecretData,
-    other: BTreeMap<SecretId, SecretData>,
+struct Secrets(BTreeMap<SecretId, SecretData>);
+
+impl Secrets {
+    fn get(&self, id: &str) -> Option<&SecretData> {
+        self.0.get(id)
+    }
 }
 
 impl<T> From<T> for Secrets
@@ -122,8 +129,10 @@ where
 {
     fn from(reader: T) -> Self {
         let mut lines = reader.lines();
-        let password = lines.next().unwrap().unwrap();
-        let other = lines
+
+        let password = lines.next().map(|line| line.unwrap());
+
+        let mut other : BTreeMap<SecretId, SecretData> = lines
             .filter_map(|line| {
                 let line = line.unwrap();
                 let mut parts = line.splitn(2, ':');
@@ -132,22 +141,28 @@ where
                 Some((id.to_string(), data.to_string()))
             })
             .collect();
-        Self { password, other }
+
+        if let Some(password) = password {
+            other.insert("password".to_string(), password);
+        }
+
+        Self(other)
     }
 }
 
 impl From<Cli> for Secrets {
     fn from(value: Cli) -> Self {
-        let mut other = BTreeMap::new();
+        let mut inner = BTreeMap::new();
 
         if let Some(username) = value.username {
-            other.insert("username".to_string(), username);
+            inner.insert("username".to_string(), username);
         }
 
-        Self {
-            password: value.password.unwrap_or_default(),
-            other,
+        if let Some(password) = value.password {
+            inner.insert("password".to_string(), password);
         }
+
+        Self(inner)
     }
 }
 
@@ -159,23 +174,28 @@ mod tests {
     fn test_password_store_single_line() {
         let input = b"password".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.password, "password");
+        assert_eq!(secrets.get("password").unwrap(), "password");
     }
 
     #[test]
     fn test_password_store_multi_line() {
         let input = b"password\nusername: test".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.password, "password");
-        assert_eq!(secrets.other.len(), 1);
-        assert_eq!(secrets.other.get("username").unwrap(), "test");
+        assert_eq!(secrets.get("password").unwrap(), "password");
+        assert_eq!(secrets.get("username").unwrap(), "test");
     }
 
     #[test]
     fn test_invalid_multiline() {
         let input = b"password\nasdasd\nqweqwe".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.password, "password");
-        assert_eq!(secrets.other.len(), 0);
+        assert_eq!(secrets.get("password").unwrap(), "password");
+    }
+
+    #[test]
+    fn test_empty_input() {
+        let input = b"".as_slice();
+        let secrets = Secrets::from(input);
+        assert!(secrets.get("password").is_none());
     }
 }
