@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand, ValueEnum};
-use passmumbler::Secrets;
+use passmumbler::{select, Secrets};
 use std::collections::BTreeMap;
 
 use gtk4 as gtk;
@@ -31,7 +31,17 @@ fn build_ui(application: &gtk::Application) {
             let secrets = Secrets::try_from(cli).unwrap();
             build_show_ui(secrets, application);
         }
-        Some(Commands::Select(_cli)) => {
+        Some(Commands::Select(cli)) => {
+            let entries = vec!["FIXME"]; // TODO
+            let entry = match cli.interface {
+                SelectInterface::Rofi => select::rofi::select(&entries),
+            };
+            if let Some(entry) = entry {
+                let secrets = passmumbler::pass::load_secrets(&entry).unwrap();
+                build_show_ui(secrets, application);
+            } else {
+                eprintln!("No entry selected");
+            }
             eprintln!("Select not implemented yet");
         }
         None => {

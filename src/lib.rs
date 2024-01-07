@@ -1,3 +1,6 @@
+pub mod select;
+pub mod pass;
+
 use std::collections::BTreeMap;
 use std::io::{BufRead, Read};
 
