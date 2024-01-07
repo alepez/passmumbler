@@ -93,7 +93,7 @@ struct Show {
 enum Commands {
     /// Show a window with the secrets to copy to the clipboard
     Show(Show),
-    /// Use rofi to select a secret to copy to the clipboard
+    /// Select a secret to copy to the clipboard
     Select,
 }
 
