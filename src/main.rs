@@ -32,7 +32,8 @@ fn build_ui(application: &gtk::Application) {
             build_show_ui(secrets, application);
         }
         Some(Commands::Select(cli)) => {
-            let entries = vec!["FIXME"]; // TODO
+            let entries = passmumbler::pass::list_entries();
+            let entries: Vec<&str> = entries.iter().map(|s| s.as_str()).collect();
             let entry = match cli.interface {
                 SelectInterface::Rofi => select::rofi::select(&entries),
             };
