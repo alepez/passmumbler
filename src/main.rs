@@ -27,16 +27,13 @@ fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Show(cli)) => {
+        Commands::Show(cli) => {
             let secrets = Secrets::try_from(cli).unwrap();
             build_show_ui(secrets, application);
         }
-        Some(Commands::Select(cli)) => {
+        Commands::Select(cli) => {
             let secrets = select_and_load_secrets(cli);
             build_show_ui(secrets, application);
-        }
-        None => {
-            panic!("No command specified");
         }
     }
 }
@@ -129,7 +126,7 @@ enum Commands {
 #[command(author, version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 impl TryFrom<Show> for Secrets {
