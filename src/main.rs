@@ -32,23 +32,25 @@ fn build_ui(application: &gtk::Application) {
             build_show_ui(secrets, application);
         }
         Some(Commands::Select(cli)) => {
-            let entries = passmumbler::pass::list_entries();
-            let entries: Vec<&str> = entries.iter().map(|s| s.as_str()).collect();
-            let entry = match cli.interface {
-                SelectInterface::Rofi => select::rofi::select(&cli.prefix, &entries),
-            };
-            if let Some(entry) = entry {
-                let secrets = passmumbler::pass::load_secrets(&entry).unwrap();
-                build_show_ui(secrets, application);
-            } else {
-                eprintln!("No entry selected");
-            }
-            eprintln!("Select not implemented yet");
+            let secrets = select_and_load_secrets(cli);
+            build_show_ui(secrets, application);
         }
         None => {
-            eprintln!("No command specified");
+            panic!("No command specified");
         }
     }
+}
+
+fn select_and_load_secrets(cli: Select) -> Secrets {
+    let entries = passmumbler::pass::list_entries();
+
+    let selected = match cli.interface {
+        SelectInterface::Rofi => select::rofi::select(&cli.prefix, &entries),
+    };
+
+    let selected = selected.expect("No secret selected");
+
+    passmumbler::pass::load_secrets(&selected).unwrap()
 }
 
 fn build_show_ui(secrets: Secrets, application: &gtk::Application) {

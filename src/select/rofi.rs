@@ -1,4 +1,4 @@
-pub fn select(prefix: &str, entries: &[&str]) -> Option<String> {
+pub fn select(prefix: &str, entries: &Vec<String>) -> Option<String> {
     let msg = "Secrets";
 
     // Keep only entries that start with the prefix
