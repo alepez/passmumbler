@@ -1,5 +1,6 @@
 use clap::Parser;
-use std::io::BufRead;
+use std::collections::BTreeMap;
+use std::io::{BufRead, Read};
 
 use gtk4 as gtk;
 
@@ -113,4 +114,54 @@ struct Cli {
     /// Read from stdin
     #[arg(short = 'i', long)]
     stdin: bool,
+}
+
+type SecretId = String;
+
+type SecretData = String;
+
+struct Secrets {
+    password: SecretData,
+    other: BTreeMap<SecretId, SecretData>,
+}
+
+impl<T> From<T> for Secrets
+where
+    T: Read + BufRead,
+{
+    fn from(reader: T) -> Self {
+        let mut lines = reader.lines();
+        let password = lines.next().unwrap().unwrap();
+        let other = lines
+            .map(|line| {
+                let line = line.unwrap();
+                let mut parts = line.splitn(2, ':');
+                let id = parts.next().unwrap();
+                let data = parts.next().unwrap().trim_start();
+                (id.to_string(), data.to_string())
+            })
+            .collect();
+        Self { password, other }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_password_store_single_line() {
+        let input = b"password".as_slice();
+        let secrets = Secrets::from(input);
+        assert_eq!(secrets.password, "password");
+    }
+
+    #[test]
+    fn test_password_store_multi_line() {
+        let input = b"password\nusername: test".as_slice();
+        let secrets = Secrets::from(input);
+        assert_eq!(secrets.password, "password");
+        assert_eq!(secrets.other.len(), 1);
+        assert_eq!(secrets.other.get("username").unwrap(), "test");
+    }
 }
