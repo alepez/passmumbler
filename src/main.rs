@@ -28,7 +28,8 @@ fn build_ui(application: &gtk::Application) {
 
     match cli.command {
         Some(Commands::Show(cli)) => {
-            build_show_ui(cli, application);
+            let secrets = Secrets::try_from(cli).unwrap();
+            build_show_ui(secrets, application);
         }
         Some(Commands::Select) => {
             eprintln!("Select not implemented yet");
@@ -39,18 +40,7 @@ fn build_ui(application: &gtk::Application) {
     }
 }
 
-fn build_show_ui(cli: Show, application: &gtk::Application) {
-    if cli.stdin && (cli.username.is_some() || cli.password.is_some()) {
-        eprintln!("password or username cannot be specified when reading from stdin");
-        return;
-    }
-
-    let secrets = if cli.stdin {
-        Secrets::from(std::io::stdin().lock())
-    } else {
-        Secrets::from(cli)
-    };
-
+fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
     let window = gtk::ApplicationWindow::builder()
         .application(application)
         .title(APPLICATION_NAME)
@@ -114,18 +104,28 @@ struct Cli {
     command: Option<Commands>,
 }
 
-impl From<Show> for Secrets {
-    fn from(value: Show) -> Self {
+impl TryFrom<Show> for Secrets {
+    type Error = &'static str;
+
+    fn try_from(cli: Show) -> Result<Self, Self::Error> {
+        if cli.stdin && (cli.username.is_some() || cli.password.is_some()) {
+            return Err("password or username cannot be specified when reading from stdin");
+        }
+
+        if cli.stdin {
+            return Ok(Secrets::from(std::io::stdin().lock()));
+        }
+
         let mut inner = BTreeMap::new();
 
-        if let Some(username) = value.username {
+        if let Some(username) = cli.username {
             inner.insert("username".to_string(), username);
         }
 
-        if let Some(password) = value.password {
+        if let Some(password) = cli.password {
             inner.insert("password".to_string(), password);
         }
 
-        Self::new(inner)
+        Ok(Self::new(inner))
     }
 }
