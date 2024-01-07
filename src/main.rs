@@ -26,12 +26,17 @@ fn main() -> glib::ExitCode {
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
 
-    let Commands::Show(cli) = cli.command.unwrap() else {
-        eprintln!("No command specified");
-        return;
-    };
-
-    build_show_ui(cli, application)
+    match cli.command {
+        Some(Commands::Show(cli)) => {
+            build_show_ui(cli, application);
+        }
+        Some(Commands::Select) => {
+            eprintln!("Select not implemented yet");
+        }
+        None => {
+            eprintln!("No command specified");
+        }
+    }
 }
 
 fn build_show_ui(cli: Show, application: &gtk::Application) {
@@ -96,7 +101,10 @@ struct Show {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Show a window with the secrets to copy to the clipboard
     Show(Show),
+    /// Use rofi to select a secret to copy to the clipboard
+    Select,
 }
 
 #[derive(Parser)]
