@@ -22,6 +22,10 @@ impl Secrets {
     pub fn iter(&self) -> impl Iterator<Item = (&SecretId, &SecretData)> {
         self.0.iter()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }
 
 impl<T> From<T> for Secrets

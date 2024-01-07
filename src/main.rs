@@ -81,6 +81,15 @@ fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
         container.append(&btn);
     }
 
+    if secrets.is_empty() {
+        let label = gtk::Label::builder()
+            .label("No secrets found")
+            .halign(gtk::Align::Center)
+            .valign(gtk::Align::Center)
+            .build();
+        container.append(&label);
+    }
+
     window.set_child(Some(&container));
     window.present();
 }
