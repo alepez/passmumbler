@@ -41,8 +41,11 @@ fn build_ui(application: &gtk::Application) {
 fn select_and_load_secrets(cli: Select) -> Secrets {
     let entries = passmumbler::pass::list_entries();
 
+    // Empty string is a valid prefix
+    let prefix = cli.prefix.unwrap_or_default();
+
     let selected = match cli.interface {
-        SelectInterface::Rofi => select::rofi::select(&cli.prefix, &entries),
+        SelectInterface::Rofi => select::rofi::select(&prefix, &entries),
     };
 
     let selected = selected.expect("No secret selected");
@@ -113,8 +116,9 @@ struct Select {
     /// The interface to use to select the secret
     #[arg(value_enum, short = 'i', long, default_value = "rofi")]
     interface: SelectInterface,
-    #[arg(short = 'p', long, default_value = "")]
-    prefix: String,
+    /// The prefix to use to filter the secrets
+    #[arg(short = 'p', long)]
+    prefix: Option<String>,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
