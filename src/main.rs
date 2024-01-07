@@ -1,6 +1,6 @@
-use clap::Parser;
-use std::collections::BTreeMap;
+use clap::{Parser, Subcommand};
 use passmumbler::Secrets;
+use std::collections::BTreeMap;
 
 use gtk4 as gtk;
 
@@ -25,6 +25,11 @@ fn main() -> glib::ExitCode {
 
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
+
+    let Commands::Show(cli) = cli.command.unwrap() else {
+        eprintln!("No command specified");
+        return;
+    };
 
     if cli.stdin && (cli.username.is_some() || cli.password.is_some()) {
         eprintln!("password or username cannot be specified when reading from stdin");
@@ -72,8 +77,7 @@ fn build_ui(application: &gtk::Application) {
 }
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
+struct Show {
     /// Username
     #[arg(short = 'u', long)]
     username: Option<String>,
@@ -86,8 +90,20 @@ struct Cli {
     stdin: bool,
 }
 
-impl From<Cli> for Secrets {
-    fn from(value: Cli) -> Self {
+#[derive(Subcommand)]
+enum Commands {
+    Show(Show),
+}
+
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+impl From<Show> for Secrets {
+    fn from(value: Show) -> Self {
         let mut inner = BTreeMap::new();
 
         if let Some(username) = value.username {
