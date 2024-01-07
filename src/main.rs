@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use passmumbler::Secrets;
 use std::collections::BTreeMap;
 
@@ -31,7 +31,7 @@ fn build_ui(application: &gtk::Application) {
             let secrets = Secrets::try_from(cli).unwrap();
             build_show_ui(secrets, application);
         }
-        Some(Commands::Select) => {
+        Some(Commands::Select(_cli)) => {
             eprintln!("Select not implemented yet");
         }
         None => {
@@ -89,12 +89,25 @@ struct Show {
     stdin: bool,
 }
 
+#[derive(Parser)]
+struct Select {
+    /// The interface to use to select the secret
+    #[arg(value_enum, short = 'i', long, default_value = "rofi")]
+    interface: SelectInterface,
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+enum SelectInterface {
+    /// Use rofi to select the secret
+    Rofi,
+}
+
 #[derive(Subcommand)]
 enum Commands {
     /// Show a window with the secrets to copy to the clipboard
     Show(Show),
     /// Select a secret to copy to the clipboard
-    Select,
+    Select(Select),
 }
 
 #[derive(Parser)]
