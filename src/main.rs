@@ -31,6 +31,10 @@ fn build_ui(application: &gtk::Application) {
         return;
     };
 
+    build_show_ui(cli, application)
+}
+
+fn build_show_ui(cli: Show, application: &gtk::Application) {
     if cli.stdin && (cli.username.is_some() || cli.password.is_some()) {
         eprintln!("password or username cannot be specified when reading from stdin");
         return;
