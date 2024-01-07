@@ -20,36 +20,22 @@ fn main() -> glib::ExitCode {
     application.run_with_args(args)
 }
 
-fn read_from_stdin() -> (Option<String>, Option<String>) {
-    let stdin = std::io::stdin();
-    let mut lines = stdin.lock().lines();
-    let password = lines.next().and_then(|x| x.ok());
-    let username = lines.find_map(|line| {
-        let line = line.ok()?;
-        if line.starts_with("username: ") {
-            Some(line.trim_start_matches("username: ").to_string())
-        } else {
-            None
-        }
-    });
-    (username, password)
-}
-
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
 
-    let (username, password) = if cli.stdin {
-        read_from_stdin()
+    let secrets = if cli.stdin {
+        Secrets::from(std::io::stdin().lock())
     } else {
-        (cli.username, cli.password)
+        Secrets::from(cli)
     };
 
-    let username = username.unwrap_or_default();
-    let password = password.unwrap_or_default();
+    let username = secrets
+        .other
+        .get("username")
+        .unwrap_or(&"".to_string())
+        .to_string();
 
-    if password.is_empty() {
-        return;
-    }
+    let password = secrets.password;
 
     let window = gtk::ApplicationWindow::builder()
         .application(application)
@@ -142,6 +128,21 @@ where
             })
             .collect();
         Self { password, other }
+    }
+}
+
+impl From<Cli> for Secrets {
+    fn from(value: Cli) -> Self {
+        let mut other = BTreeMap::new();
+
+        if let Some(username) = value.username {
+            other.insert("username".to_string(), username);
+        }
+
+        Self {
+            password: value.password.unwrap_or_default(),
+            other,
+        }
     }
 }
 
