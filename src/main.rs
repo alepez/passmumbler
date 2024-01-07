@@ -91,6 +91,7 @@ struct Cli {
     #[arg(short = 'p', long)]
     password: Option<String>,
     /// Read from stdin
+    /// Check https://www.passwordstore.org/ for the format
     #[arg(short = 'i', long)]
     stdin: bool,
 }
@@ -114,8 +115,10 @@ where
     fn from(reader: T) -> Self {
         let mut lines = reader.lines();
 
+        // First line is the password
         let password = lines.next().map(|line| line.unwrap());
 
+        // All other lines are key-value pairs, separated by a colon
         let mut other: BTreeMap<SecretId, SecretData> = lines
             .filter_map(|line| {
                 let line = line.unwrap();
@@ -126,6 +129,7 @@ where
             })
             .collect();
 
+        // Add the password, only if it is non-empty
         if let Some(password) = password {
             other.insert("password".to_string(), password);
         }
@@ -156,24 +160,24 @@ mod tests {
 
     #[test]
     fn test_password_store_single_line() {
-        let input = b"password".as_slice();
+        let input = b"THIS_IS_THE_PASSWORD".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.get("password").unwrap(), "password");
+        assert_eq!(secrets.get("password").unwrap(), "THIS_IS_THE_PASSWORD");
     }
 
     #[test]
     fn test_password_store_multi_line() {
-        let input = b"password\nusername: test".as_slice();
+        let input = b"THIS_IS_THE_PASSWORD\nusername: test".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.get("password").unwrap(), "password");
+        assert_eq!(secrets.get("password").unwrap(), "THIS_IS_THE_PASSWORD");
         assert_eq!(secrets.get("username").unwrap(), "test");
     }
 
     #[test]
     fn test_invalid_multiline() {
-        let input = b"password\nasdasd\nqweqwe".as_slice();
+        let input = b"THIS_IS_THE_PASSWORD\nasdasd\nqweqwe".as_slice();
         let secrets = Secrets::from(input);
-        assert_eq!(secrets.get("password").unwrap(), "password");
+        assert_eq!(secrets.get("password").unwrap(), "THIS_IS_THE_PASSWORD");
     }
 
     #[test]
@@ -181,5 +185,6 @@ mod tests {
         let input = b"".as_slice();
         let secrets = Secrets::from(input);
         assert!(secrets.get("password").is_none());
+        assert!(secrets.0.is_empty());
     }
 }
