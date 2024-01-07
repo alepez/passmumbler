@@ -23,6 +23,11 @@ fn main() -> glib::ExitCode {
 fn build_ui(application: &gtk::Application) {
     let cli = Cli::parse();
 
+    if cli.stdin && (cli.username.is_some() || cli.password.is_some()) {
+        eprintln!("password or username cannot be specified when reading from stdin");
+        return;
+    }
+
     let secrets = if cli.stdin {
         Secrets::from(std::io::stdin().lock())
     } else {
