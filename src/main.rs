@@ -34,18 +34,6 @@ fn build_ui(application: &gtk::Application) {
         Secrets::from(cli)
     };
 
-    let username = secrets
-        .0
-        .get("username")
-        .unwrap_or(&"".to_string())
-        .to_string();
-
-    let password = secrets
-        .0
-        .get("password")
-        .unwrap_or(&"".to_string())
-        .to_string();
-
     let window = gtk::ApplicationWindow::builder()
         .application(application)
         .title("passmumbler")
@@ -71,17 +59,13 @@ fn build_ui(application: &gtk::Application) {
         .spacing(24)
         .build();
 
-    let username_btn = gtk::Button::with_label(username.as_str());
-    username_btn.connect_clicked(clone!(@weak clipboard => move |_btn| {
-        clipboard.set_text(username.as_str());
-    }));
-    text_container.append(&username_btn);
-
-    let password_btn = gtk::Button::with_label("Password");
-    password_btn.connect_clicked(clone!(@weak clipboard => move |_btn| {
-        clipboard.set_text(password.as_str());
-    }));
-    text_container.append(&password_btn);
+    for (label, data) in secrets.0.iter() {
+        let btn = gtk::Button::with_label(label);
+        btn.connect_clicked(clone!(@to-owned data, @weak clipboard => move |_btn| {
+            clipboard.set_text(data.as_str());
+        }));
+        text_container.append(&btn);
+    }
 
     container.append(&text_container);
 
@@ -132,7 +116,7 @@ where
 
         let password = lines.next().map(|line| line.unwrap());
 
-        let mut other : BTreeMap<SecretId, SecretData> = lines
+        let mut other: BTreeMap<SecretId, SecretData> = lines
             .filter_map(|line| {
                 let line = line.unwrap();
                 let mut parts = line.splitn(2, ':');
