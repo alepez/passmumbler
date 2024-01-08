@@ -115,7 +115,7 @@ struct Show {
 #[derive(Parser)]
 struct Select {
     /// The interface to use to select the secret
-    #[arg(value_enum, short = 'i', long, default_value = "rofi")]
+    #[arg(value_enum, short = 'i', long, default_value = "dmenu")]
     interface: SelectInterface,
     /// The prefix to use to filter the secrets
     #[arg(short = 'p', long)]
