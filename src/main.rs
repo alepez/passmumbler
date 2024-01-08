@@ -85,6 +85,15 @@ fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
         container.append(&btn);
     }
 
+    {
+        let btn = gtk::Button::with_label("Clear & Close");
+        btn.connect_clicked(clone!(@weak window, @weak clipboard => move |_btn| {
+            clipboard.set_text("");
+            window.close();
+        }));
+        container.append(&btn);
+    }
+
     if secrets.is_empty() {
         let label = gtk::Label::builder()
             .label("No secrets found")
