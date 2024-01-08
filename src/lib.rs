@@ -1,5 +1,5 @@
-pub mod select;
 pub mod pass;
+pub mod select;
 
 use std::collections::BTreeMap;
 use std::io::{BufRead, Read};
@@ -41,6 +41,7 @@ where
         // All other lines are key-value pairs, separated by a colon
         let mut other: BTreeMap<SecretId, SecretData> = lines
             .filter_map(|x| x.ok())
+            .take_while(|line| line != "---")
             .filter_map(|line| {
                 let mut parts = line.splitn(2, ':');
                 let id = parts.next()?;
@@ -90,5 +91,13 @@ mod tests {
         let secrets = Secrets::from(input);
         assert!(secrets.get("password").is_none());
         assert!(secrets.0.is_empty());
+    }
+
+    #[test]
+    fn test_password_store_multi_line_with_end_delimiter() {
+        let input = b"THIS_IS_THE_PASSWORD\n---\nusername: test".as_slice();
+        let secrets = Secrets::from(input);
+        assert_eq!(secrets.get("password").unwrap(), "THIS_IS_THE_PASSWORD");
+        assert!(secrets.get("username").is_none());
     }
 }
