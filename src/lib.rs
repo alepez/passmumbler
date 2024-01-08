@@ -40,8 +40,8 @@ where
 
         // All other lines are key-value pairs, separated by a colon
         let mut other: BTreeMap<SecretId, SecretData> = lines
+            .filter_map(|x| x.ok())
             .filter_map(|line| {
-                let line = line.unwrap();
                 let mut parts = line.splitn(2, ':');
                 let id = parts.next()?;
                 let data = parts.next()?.trim_start();
