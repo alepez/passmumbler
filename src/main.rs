@@ -8,13 +8,14 @@ use gtk::{
     gdk,
     glib::{self, clone},
     prelude::*,
+    Align, Application, ApplicationWindow, Box, Button, Label, Orientation,
 };
 
 const APPLICATION_ID: &str = "net.pezzato.passmumbler";
 const APPLICATION_NAME: &str = "passmumbler";
 
 fn main() -> glib::ExitCode {
-    let application = gtk::Application::builder()
+    let application = Application::builder()
         .application_id(APPLICATION_ID)
         .build();
     application.connect_activate(build_ui);
@@ -23,7 +24,7 @@ fn main() -> glib::ExitCode {
     application.run_with_args(args)
 }
 
-fn build_ui(application: &gtk::Application) {
+fn build_ui(application: &Application) {
     let cli = Cli::parse();
 
     match cli.command {
@@ -54,8 +55,8 @@ fn select_and_load_secrets(cli: Select) -> Secrets {
     passmumbler::pass::load_secrets(&selected).unwrap()
 }
 
-fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
-    let window = gtk::ApplicationWindow::builder()
+fn build_show_ui(secrets: Secrets, application: &Application) {
+    let window = ApplicationWindow::builder()
         .application(application)
         .title(APPLICATION_NAME)
         .modal(true)
@@ -66,19 +67,19 @@ fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
 
     const SPACING: i32 = 12;
 
-    let container = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
+    let container = Box::builder()
+        .orientation(Orientation::Vertical)
         .margin_top(SPACING)
         .margin_start(SPACING)
         .margin_end(SPACING)
         .margin_bottom(SPACING)
         .spacing(SPACING)
-        .halign(gtk::Align::Center)
-        .valign(gtk::Align::Center)
+        .halign(Align::Center)
+        .valign(Align::Center)
         .build();
 
     for (label, data) in secrets.iter() {
-        let btn = gtk::Button::with_label(label);
+        let btn = Button::with_label(label);
         btn.connect_clicked(clone!(@to-owned data, @weak clipboard => move |_btn| {
             clipboard.set_text(data.as_str());
         }));
@@ -86,7 +87,7 @@ fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
     }
 
     {
-        let btn = gtk::Button::with_label("Clear & Close");
+        let btn = Button::with_label("Clear & Close");
         btn.connect_clicked(clone!(@weak window, @weak clipboard => move |_btn| {
             clipboard.set_text("");
             window.close();
@@ -95,10 +96,10 @@ fn build_show_ui(secrets: Secrets, application: &gtk::Application) {
     }
 
     if secrets.is_empty() {
-        let label = gtk::Label::builder()
+        let label = Label::builder()
             .label("No secrets found")
-            .halign(gtk::Align::Center)
-            .valign(gtk::Align::Center)
+            .halign(Align::Center)
+            .valign(Align::Center)
             .build();
         container.append(&label);
     }
