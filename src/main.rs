@@ -46,6 +46,7 @@ fn select_and_load_secrets(cli: Select) -> Secrets {
 
     let selected = match cli.interface {
         SelectInterface::Rofi => select::rofi::select(&prefix, &entries),
+        SelectInterface::Dmenu => select::dmenu::select(&prefix, &entries),
     };
 
     let selected = selected.expect("No secret selected");
@@ -125,6 +126,8 @@ struct Select {
 enum SelectInterface {
     /// Use rofi to select the secret
     Rofi,
+    /// Use dmenu to select the secret
+    Dmenu,
 }
 
 #[derive(Subcommand)]

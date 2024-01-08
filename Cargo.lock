@@ -183,6 +183,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dmenu_facade"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "372af688af899981cb3d9d0b23de762c906d6367325d3a7304f7ad90c4b74d0f"
+
+[[package]]
 name = "equivalent"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -631,6 +637,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "dirs",
+ "dmenu_facade",
  "glob",
  "gtk4",
  "rofi",

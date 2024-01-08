@@ -9,3 +9,4 @@ gtk4 = { version = "0.7.3", features = ["v4_2"] }
 rofi = "0.3.0"
 dirs = "5.0.1"
 glob = "0.3.1"
+dmenu_facade = "0.3.0"
