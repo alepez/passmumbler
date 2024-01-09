@@ -41,18 +41,24 @@ fn build_ui(application: &Application) {
     }
 }
 
+fn make_select_tool(interface_type: SelectInterface) -> Box<dyn SelectTool> {
+    match interface_type {
+        SelectInterface::Rofi => Box::new(select::rofi::RofiSelectTool),
+        SelectInterface::Dmenu => Box::new(select::dmenu::DmenuSelectTool),
+    }
+}
+
 fn select_and_load_secrets(cli: Select) -> (String, Secrets) {
     let entries = list_entries();
 
     // Empty string is a valid prefix
     let prefix = cli.prefix.unwrap_or_default();
 
-    let selected = match cli.interface {
-        SelectInterface::Rofi => select::rofi::RofiSelectTool.select(&prefix, &entries),
-        SelectInterface::Dmenu => select::dmenu::DmenuSelectTool.select(&prefix, &entries),
-    };
+    let select_tool = make_select_tool(cli.interface);
 
-    let selected = selected.expect("No secret selected");
+    let selected = select_tool
+        .select(&prefix, &entries)
+        .expect("No secret selected");
 
     let secrets = load_secrets(&selected).unwrap();
 
