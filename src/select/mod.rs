@@ -2,8 +2,8 @@ use crate::pass::{list_entries, load_secrets};
 use crate::Secrets;
 
 pub mod dmenu;
-pub mod rofi;
 pub mod fzf;
+pub mod rofi;
 
 /// Keep only entries that start with the prefix
 /// Remove prefix from all entries
