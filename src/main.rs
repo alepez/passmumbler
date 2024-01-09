@@ -32,7 +32,7 @@ fn build_ui(application: &Application) {
             build_show_ui(props, application);
         }
         Commands::Select(cli) => {
-            let select_tool = make_select_tool(cli.interface);
+            let select_tool = make_select_tool(cli.interface, application);
             // Empty string is a valid prefix
             let prefix = cli.prefix.unwrap_or_default();
 
@@ -47,10 +47,14 @@ fn build_ui(application: &Application) {
     }
 }
 
-fn make_select_tool(interface_type: SelectInterface) -> Box<dyn SelectTool> {
+fn make_select_tool(
+    interface_type: SelectInterface,
+    application: &Application,
+) -> Box<dyn SelectTool> {
     match interface_type {
         SelectInterface::Rofi => Box::new(select::rofi::RofiSelectTool),
         SelectInterface::Dmenu => Box::new(select::dmenu::DmenuSelectTool),
+        SelectInterface::Gtk4 => Box::new(select::gtk4::Gtk4SelectTool::new(application)),
     }
 }
 
@@ -87,6 +91,8 @@ enum SelectInterface {
     Rofi,
     /// Use dmenu to select the secret
     Dmenu,
+    /// Use gtk4 dialog to select the secret
+    Gtk4,
 }
 
 #[derive(Subcommand)]
