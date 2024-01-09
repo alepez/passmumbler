@@ -92,6 +92,16 @@ fn build_show_ui(props: Props, application: &Application) {
         .valign(Align::Center)
         .build();
 
+    // Add a title if specified
+    if let Some(title) = title {
+        let label = Label::builder()
+            .label(title)
+            .halign(Align::Center)
+            .valign(Align::Center)
+            .build();
+        container.append(&label);
+    }
+
     // Add all the secrets as buttons, which when clicked will copy the secret to the clipboard
     for (label, data) in secrets.iter() {
         let btn = Button::with_label(label);
@@ -108,7 +118,7 @@ fn build_show_ui(props: Props, application: &Application) {
         } else {
             "Clear & Close"
         };
-        
+
         let btn = Button::with_label(txt);
         btn.connect_clicked(clone!(@weak window, @weak clipboard => move |_btn| {
             clipboard.set_text("");
