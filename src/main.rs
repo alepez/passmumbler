@@ -15,6 +15,7 @@ fn main() -> glib::ExitCode {
     let application = Application::builder()
         .application_id(APPLICATION_ID)
         .build();
+
     application.connect_activate(build_ui);
 
     let args: &[&str] = &[];
@@ -36,13 +37,11 @@ fn build_ui(application: &Application) {
             // Empty string is a valid prefix
             let prefix = cli.prefix.unwrap_or_default();
 
-            let (title, secrets) = select_tool
-                .select_and_load_secrets(prefix.as_str())
-                .unwrap();
-
-            let title = Some(title);
-            let props = Props { title, secrets };
-            build_show_ui(props, application);
+            if let Some((title, secrets)) = select_tool.select_and_load_secrets(prefix.as_str()) {
+                let title = Some(title);
+                let props = Props { title, secrets };
+                build_show_ui(props, application);
+            }
         }
     }
 }
