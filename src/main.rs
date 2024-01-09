@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand, ValueEnum};
+use passmumbler::pass::{list_entries, load_secrets};
 use passmumbler::{select, Secrets};
 use std::collections::BTreeMap;
 
@@ -40,7 +41,7 @@ fn build_ui(application: &Application) {
 }
 
 fn select_and_load_secrets(cli: Select) -> Secrets {
-    let entries = passmumbler::pass::list_entries();
+    let entries = list_entries();
 
     // Empty string is a valid prefix
     let prefix = cli.prefix.unwrap_or_default();
@@ -52,7 +53,7 @@ fn select_and_load_secrets(cli: Select) -> Secrets {
 
     let selected = selected.expect("No secret selected");
 
-    passmumbler::pass::load_secrets(&selected).unwrap()
+    load_secrets(&selected).unwrap()
 }
 
 fn build_show_ui(secrets: Secrets, application: &Application) {
