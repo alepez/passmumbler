@@ -92,6 +92,7 @@ fn build_show_ui(props: Props, application: &Application) {
         .valign(Align::Center)
         .build();
 
+    // Add all the secrets as buttons, which when clicked will copy the secret to the clipboard
     for (label, data) in secrets.iter() {
         let btn = Button::with_label(label);
         btn.connect_clicked(clone!(@to-owned data, @weak clipboard => move |_btn| {
@@ -100,8 +101,15 @@ fn build_show_ui(props: Props, application: &Application) {
         container.append(&btn);
     }
 
+    // Add a button to clear the clipboard and close the window
     {
-        let btn = Button::with_label("Clear & Close");
+        let txt = if secrets.is_empty() {
+            "Close"
+        } else {
+            "Clear & Close"
+        };
+        
+        let btn = Button::with_label(txt);
         btn.connect_clicked(clone!(@weak window, @weak clipboard => move |_btn| {
             clipboard.set_text("");
             window.close();
@@ -109,6 +117,7 @@ fn build_show_ui(props: Props, application: &Application) {
         container.append(&btn);
     }
 
+    // Show some text if there are no secrets
     if secrets.is_empty() {
         let label = Label::builder()
             .label("No secrets found")
