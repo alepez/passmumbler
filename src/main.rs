@@ -30,17 +30,21 @@ fn build_ui(application: &Application) {
 
     match cli.command {
         Commands::Show(cli) => {
+            let title = cli.title.clone();
             let secrets = Secrets::try_from(cli).unwrap();
-            build_show_ui(secrets, application);
+            let props = Props { title, secrets };
+            build_show_ui(props, application);
         }
         Commands::Select(cli) => {
-            let secrets = select_and_load_secrets(cli);
-            build_show_ui(secrets, application);
+            let (title, secrets) = select_and_load_secrets(cli);
+            let title = Some(title);
+            let props = Props { title, secrets };
+            build_show_ui(props, application);
         }
     }
 }
 
-fn select_and_load_secrets(cli: Select) -> Secrets {
+fn select_and_load_secrets(cli: Select) -> (String, Secrets) {
     let entries = list_entries();
 
     // Empty string is a valid prefix
@@ -53,10 +57,19 @@ fn select_and_load_secrets(cli: Select) -> Secrets {
 
     let selected = selected.expect("No secret selected");
 
-    load_secrets(&selected).unwrap()
+    let secrets = load_secrets(&selected).unwrap();
+
+    (selected, secrets)
 }
 
-fn build_show_ui(secrets: Secrets, application: &Application) {
+struct Props {
+    title: Option<String>,
+    secrets: Secrets,
+}
+
+fn build_show_ui(props: Props, application: &Application) {
+    let Props { title, secrets } = props;
+
     let window = ApplicationWindow::builder()
         .application(application)
         .title(APPLICATION_NAME)
@@ -111,6 +124,9 @@ fn build_show_ui(secrets: Secrets, application: &Application) {
 
 #[derive(Parser)]
 struct Show {
+    /// Title
+    #[arg(short = 't', long)]
+    title: Option<String>,
     /// Username
     #[arg(short = 'u', long)]
     username: Option<String>,
