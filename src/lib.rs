@@ -41,7 +41,7 @@ where
 
         // All other lines are key-value pairs, separated by a colon
         let mut other: BTreeMap<SecretId, SecretData> = lines
-            .filter_map(|x| x.ok())
+            .map_while(Result::ok)
             .take_while(|line| line != "---")
             .filter_map(|line| {
                 let mut parts = line.splitn(2, ':');
