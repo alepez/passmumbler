@@ -1,9 +1,9 @@
 use std::{
-    io::{Write},
+    io::Write,
     process::{Command, Stdio},
 };
 
-use crate::select::{SelectTool};
+use crate::select::SelectTool;
 
 pub struct FzfSelectTool;
 
@@ -22,6 +22,10 @@ impl SelectTool for FzfSelectTool {
         });
 
         let output = fzf.wait_with_output().ok()?;
+
+        if !output.status.success() || output.stdout.is_empty() {
+            return None;
+        }
 
         // The output from fzf is the selected entry
         String::from_utf8(output.stdout).ok()
