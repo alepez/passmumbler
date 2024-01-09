@@ -3,7 +3,7 @@ use crate::select::{filter_and_remove_prefix, SelectTool};
 pub struct RofiSelectTool;
 
 impl SelectTool for RofiSelectTool {
-    fn select(&self, prefix: &str, entries: &Vec<String>) -> Option<String> {
+    fn select(&self, prefix: &str, entries: Vec<String>) -> Option<String> {
         let msg = "Secrets";
         let entries = filter_and_remove_prefix(prefix, entries);
 

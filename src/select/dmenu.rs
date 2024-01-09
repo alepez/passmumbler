@@ -4,7 +4,7 @@ use dmenu_facade::DMenu;
 pub struct DmenuSelectTool;
 
 impl SelectTool for DmenuSelectTool {
-    fn select(&self, prefix: &str, entries: &Vec<String>) -> Option<String> {
+    fn select(&self, prefix: &str, entries: Vec<String>) -> Option<String> {
         let msg = "Secrets";
         let entries = filter_and_remove_prefix(prefix, entries);
 
