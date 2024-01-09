@@ -8,9 +8,7 @@ use crate::select::{filter_and_remove_prefix, SelectTool};
 pub struct FzfSelectTool;
 
 impl SelectTool for FzfSelectTool {
-    fn select(&self, prefix: &str, entries: Vec<String>) -> Option<String> {
-        let entries = filter_and_remove_prefix(prefix, entries);
-
+    fn select(&self, entries: Vec<String>) -> Option<String> {
         let mut fzf = Command::new("fzf")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -24,9 +22,8 @@ impl SelectTool for FzfSelectTool {
         });
 
         let output = fzf.wait_with_output().ok()?;
-        let s = String::from_utf8(output.stdout).ok()?;
 
-        // Add prefix back
-        Some(format!("{prefix}{s}"))
+        // The output from fzf is the selected entry
+        String::from_utf8(output.stdout).ok()
     }
 }
