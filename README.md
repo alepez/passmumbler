@@ -1,9 +1,14 @@
 # passmumbler
 
 A simple graphical tool which integrates with [password-store](https://www.passwordstore.org/)
-and [rofi](https://github.com/davatorium/rofi) or [dmenu](https://tools.suckless.org/dmenu/) to easily copy passwords (and other secrets) to the clipboard.
+and [rofi](https://github.com/davatorium/rofi) or [dmenu](https://tools.suckless.org/dmenu/)
+to easily copy passwords (and other secrets) to the clipboard.
 
 ![Screenshot](.screenshot.png)
+
+Why? Because I'm lazy and I don't want to type my passwords, but I also don't
+want to deal with different plugins for different browsers or other
+applications.
 
 ## Installation
 
@@ -11,7 +16,9 @@ Clone this repository and run `cargo install --path .` in the repository root.
 
 ## Usage
 
-To use `passmumbler`, you need to have a password store initialized. See the [password-store documentation](https://www.passwordstore.org/#usage) for more information.
+To use `passmumbler`, you need to have a password store initialized.
+See the [password-store documentation](https://www.passwordstore.org/#usage)
+for more information.
 
 You also need to have either `rofi` or `dmenu` installed.
 
