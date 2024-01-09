@@ -11,8 +11,7 @@ fn filter_and_remove_prefix(prefix: &str, entries: Vec<String>) -> Vec<String> {
     entries
         .iter()
         .filter(|s| s.starts_with(prefix))
-        .map(|s| s.strip_prefix(prefix))
-        .flatten()
+        .filter_map(|s| s.strip_prefix(prefix))
         .map(|s| s.to_string())
         .collect()
 }

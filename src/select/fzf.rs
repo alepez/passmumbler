@@ -1,9 +1,9 @@
 use std::{
-    io::{self, Write},
-    process::{Child, ChildStdin, Command, Stdio},
+    io::{Write},
+    process::{Command, Stdio},
 };
 
-use crate::select::{filter_and_remove_prefix, SelectTool};
+use crate::select::{SelectTool};
 
 pub struct FzfSelectTool;
 

@@ -1,4 +1,4 @@
-use super::{filter_and_remove_prefix, SelectTool};
+use super::{SelectTool};
 use dmenu_facade::DMenu;
 
 pub struct DmenuSelectTool;
