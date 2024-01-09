@@ -107,6 +107,7 @@ fn build_show_ui(props: Props, application: &Application) {
     // Add all the secrets as buttons, which when clicked will copy the secret to the clipboard
     for (label, data) in secrets.iter() {
         let btn = Button::with_label(label);
+        btn.set_tooltip_text(Some("Copy to clipboard"));
         btn.connect_clicked(clone!(@to-owned data, @weak clipboard => move |_btn| {
             clipboard.set_text(data.as_str());
         }));
