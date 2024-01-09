@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use passmumbler::pass::{list_entries, load_secrets};
+use passmumbler::select::SelectTool;
 use passmumbler::{select, Secrets};
 use std::collections::BTreeMap;
 
@@ -47,8 +48,8 @@ fn select_and_load_secrets(cli: Select) -> (String, Secrets) {
     let prefix = cli.prefix.unwrap_or_default();
 
     let selected = match cli.interface {
-        SelectInterface::Rofi => select::rofi::select(&prefix, &entries),
-        SelectInterface::Dmenu => select::dmenu::select(&prefix, &entries),
+        SelectInterface::Rofi => select::rofi::RofiSelectTool.select(&prefix, &entries),
+        SelectInterface::Dmenu => select::dmenu::DmenuSelectTool.select(&prefix, &entries),
     };
 
     let selected = selected.expect("No secret selected");

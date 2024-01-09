@@ -11,3 +11,7 @@ fn filter_and_remove_prefix<'a>(prefix: &str, entries: &'a Vec<String>) -> Vec<&
         .flatten()
         .collect()
 }
+
+pub trait SelectTool {
+    fn select(&self, prefix: &str, entries: &Vec<String>) -> Option<String>;
+}
