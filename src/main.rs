@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand, ValueEnum};
-use passmumbler::pass::{list_entries, load_secrets};
 use passmumbler::select::SelectTool;
 use passmumbler::{select, Secrets};
 use std::collections::BTreeMap;
@@ -33,7 +32,14 @@ fn build_ui(application: &Application) {
             build_show_ui(props, application);
         }
         Commands::Select(cli) => {
-            let (title, secrets) = select_and_load_secrets(cli);
+            let select_tool = make_select_tool(cli.interface);
+            // Empty string is a valid prefix
+            let prefix = cli.prefix.unwrap_or_default();
+
+            let (title, secrets) = select_tool
+                .select_and_load_secrets(prefix.as_str())
+                .unwrap();
+
             let title = Some(title);
             let props = Props { title, secrets };
             build_show_ui(props, application);
@@ -46,25 +52,6 @@ fn make_select_tool(interface_type: SelectInterface) -> Box<dyn SelectTool> {
         SelectInterface::Rofi => Box::new(select::rofi::RofiSelectTool),
         SelectInterface::Dmenu => Box::new(select::dmenu::DmenuSelectTool),
     }
-}
-
-fn select_and_load_secrets(cli: Select) -> (String, Secrets) {
-    let entries = list_entries();
-
-    // Empty string is a valid prefix
-    let prefix = cli.prefix.unwrap_or_default();
-
-    let select_tool = make_select_tool(cli.interface);
-
-    let selected = select_tool
-        .select(&prefix, &entries)
-        .expect("No secret selected");
-
-    let secrets = load_secrets(&selected).unwrap();
-
-    let selected = selected.strip_prefix(&prefix).unwrap().to_string();
-
-    (selected, secrets)
 }
 
 #[derive(Parser)]
