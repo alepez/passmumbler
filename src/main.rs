@@ -59,6 +59,8 @@ fn select_and_load_secrets(cli: Select) -> (String, Secrets) {
 
     let secrets = load_secrets(&selected).unwrap();
 
+    let selected = selected.strip_prefix(&prefix).unwrap().to_string();
+
     (selected, secrets)
 }
 
