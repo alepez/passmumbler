@@ -34,13 +34,22 @@ fn build_ui(application: &Application) {
         }
         Commands::Select(cli) => {
             let select_tool = make_select_tool(cli.interface);
+
             // Empty string is a valid prefix
             let prefix = cli.prefix.unwrap_or_default();
 
-            if let Some((title, secrets)) = select_tool.select_and_load_secrets(prefix.as_str()) {
-                let title = Some(title);
-                let props = Props { title, secrets };
-                build_show_ui(props, application);
+            match select_tool.select_and_load_secrets(prefix.as_str()) {
+                Ok((title, secrets)) => {
+                    let title = Some(title);
+                    let props = Props { title, secrets };
+                    build_show_ui(props, application);
+                }
+                Err(select::Error::NothingSelected) => {
+                    eprintln!("Nothing selected");
+                }
+                Err(select::Error::NoSecretsFound) => {
+                    eprintln!("No secrets found");
+                }
             }
         }
     }
