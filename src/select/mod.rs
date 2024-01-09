@@ -3,6 +3,7 @@ use crate::Secrets;
 
 pub mod dmenu;
 pub mod rofi;
+pub mod fzf;
 
 /// Keep only entries that start with the prefix
 /// Remove prefix from all entries

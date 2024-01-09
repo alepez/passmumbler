@@ -51,6 +51,7 @@ fn make_select_tool(interface_type: SelectInterface) -> Box<dyn SelectTool> {
     match interface_type {
         SelectInterface::Rofi => Box::new(select::rofi::RofiSelectTool),
         SelectInterface::Dmenu => Box::new(select::dmenu::DmenuSelectTool),
+        SelectInterface::Fzf => Box::new(select::fzf::FzfSelectTool),
     }
 }
 
@@ -87,6 +88,8 @@ enum SelectInterface {
     Rofi,
     /// Use dmenu to select the secret
     Dmenu,
+    /// Use fzf to select the secret (needs to run in a terminal)
+    Fzf,
 }
 
 #[derive(Subcommand)]
